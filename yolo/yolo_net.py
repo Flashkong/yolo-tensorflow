@@ -41,6 +41,8 @@ class YOLONet(object):
             is_training=is_training)
 
         if is_training:
+            #对于每一个图片，在训练的时候，经过网络输出的output应该是7*7*30，而每一张图片的标签应该是7*7*(5+20)
+            #因为每个图片只有GT的bbox和class分类结果
             self.labels = tf.placeholder(
                 tf.float32,
                 [None, self.cell_size, self.cell_size, 5 + self.num_class])
