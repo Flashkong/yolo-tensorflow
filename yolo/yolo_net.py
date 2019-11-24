@@ -304,7 +304,10 @@ class YOLONet(object):
             # 当格子中的确有目标时，取值为[1,1]，[1,0],[0,1]
             # 比如某一个格子的值为[1,0]，表示第一个边界框负责该格子目标的预测  [0,1]：表示第二个边界框负责该格子目标的预测
             # 当格子没有目标时，取值为[0,0]
+            # 其中，3代表[45，7，7，2]中，2这一个维度，相当于是在那两个边界框的IOU当中取了最大值，取完之后大小为，[45,7,7,1]
             object_mask = tf.reduce_max(iou_predict_truth, 3, keep_dims=True)
+            # 相当于a是(45,7,7,2) b是(45,7,7,1) 那么a>=b得到的结果是(45,7,7,2)而且结果都是(True,False)这种类型的
+            # 在这里又使用了一个类型转换的，把他们转换一下，乘以response就是相当于判断了一下这个cell是否有框
             object_mask = tf.cast(
                 (iou_predict_truth >= object_mask), tf.float32) * response
 
@@ -322,6 +325,8 @@ class YOLONet(object):
 
             # class_loss 分类损失，如果目标出现在网格中 response为1，否则response为0  原文代价函数公式第5项
             # 该项表名当格子中有目标时，预测的类别越接近实际类别，代价值越小  原文代价函数公式第5项
+            # class_delta 的 大小为[45*7*7*20]
+            # 在这里，这个response就代表了1iobj，即if object appears in cell i
             class_delta = response * (predict_classes - classes)
             class_loss = tf.reduce_mean(
                 tf.reduce_sum(tf.square(class_delta), axis=[1, 2, 3]),
