@@ -28,7 +28,7 @@ class Solver(object):
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
         self.save_cfg()
-
+        # 这一句话是得到全局的tf变量
         self.variable_to_restore = tf.global_variables()
         self.saver = tf.train.Saver(self.variable_to_restore, max_to_keep=None)
         self.ckpt_file = os.path.join(self.output_dir, 'yolo')
@@ -63,6 +63,7 @@ class Solver(object):
         for step in range(1, self.max_iter + 1):
 
             load_timer.tic()
+            # 这里是调用了pascal类的方法，得到的的image大小为[45,448,448,3],labels的大小为[45,7,7,25]
             images, labels = self.data.get()
             load_timer.toc()
             feed_dict = {self.net.images: images,
@@ -131,6 +132,7 @@ def update_config_paths(data_dir, weights_file):
     cfg.WEIGHTS_FILE = os.path.join(cfg.WEIGHTS_DIR, weights_file)
 
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', default="YOLO_small.ckpt", type=str)
@@ -140,7 +142,7 @@ def main():
     parser.add_argument('--gpu', default='', type=str)
     args = parser.parse_args()
 
-    if args.gpu is not None:
+    if args.gpu is not '':
         cfg.GPU = args.gpu
 
     if args.data_dir != cfg.DATA_PATH:

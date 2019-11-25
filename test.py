@@ -105,6 +105,7 @@ class Detector(object):
                 probs[:, :, i, j] = np.multiply(
                     class_probs[:, :, j], scales[:, :, i])
 
+        # todo 这里有一个NMS算法，但是我没有看懂，以后如果有机会的话可以接着看看
         filter_mat_probs = np.array(probs >= self.threshold, dtype='bool')
         filter_mat_boxes = np.nonzero(filter_mat_probs)
         boxes_filtered = boxes[filter_mat_boxes[0],

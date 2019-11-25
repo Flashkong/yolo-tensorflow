@@ -16,8 +16,10 @@ class pascal_voc(object):
         self.image_size = cfg.IMAGE_SIZE
         self.cell_size = cfg.CELL_SIZE
         self.classes = cfg.CLASSES
+        # 这一句相当于转换为了一个dict，每个dict的name是类别的名字，value是0-19
         self.class_to_ind = dict(zip(self.classes, range(len(self.classes))))
         self.flipped = cfg.FLIPPED
+        # phase的内容是‘train’
         self.phase = phase
         self.rebuild = rebuild
         self.cursor = 0

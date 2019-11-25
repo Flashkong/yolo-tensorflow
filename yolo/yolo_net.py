@@ -8,16 +8,14 @@ slim = tf.contrib.slim
 class YOLONet(object):
 
     def __init__(self, is_training=True):
-        ''' 构造函数
-        利用 cfg 文件对网络参数进行初始化，同时定义网络的输入和输出 size 等信息，
-        其中 offset 的作用应该是一个定长的偏移
-        boundery1和boundery2 作用是在输出中确定每种信息的长度（如类别，置信度等）。
-        其中 boundery1 指的是对于所有的 cell 的类别的预测的张量维度，所以是 self.cell_size * self.cell_size * self.num_class
-        boundery2 指的是在类别之后每个cell 所对应的 bounding boxes 的数量的总和，所以是self.boundary1 + self.cell_size * self.cell_size * self.boxes_per_cell
+        """ 构造函数 利用 cfg 文件对网络参数进行初始化，同时定义网络的输入和输出 size 等信息， 其中 offset 的作用应该是一个定长的偏移 boundery1和boundery2
+        作用是在输出中确定每种信息的长度（如类别，置信度等）。 其中 boundery1 指的是对于所有的 cell 的类别的预测的张量维度，所以是 self.cell_size * self.cell_size *
+        self.num_class boundery2 指的是在类别之后每个cell 所对应的 bounding boxes 的数量的总和，所以是self.boundary1 + self.cell_size *
+        self.cell_size * self.boxes_per_cell
 
         args:
             is_training：训练？
-        '''
+        """
         # VOC 2012数据集类别名
         self.classes = cfg.CLASSES
         # 类别个数C 20
@@ -227,11 +225,9 @@ class YOLONet(object):
         return tf.clip_by_value(inter_square / union_square, 0.0, 1.0)
 
     def loss_layer(self, predicts, labels, scope='loss_layer'):
-        '''
-            计算预测和标签之间的损失函数
+        """ 计算预测和标签之间的损失函数
 
             args：
-                todo : 这里不太懂
                 predicts：Yolo网络的输出 形状[None,1470]
                           0：7*7*20：表示预测类别
                           7*7*20:7*7*20 + 7*7*2:表示预测置信度，即预测的边界框与实际边界框之间的IOU
@@ -240,7 +236,7 @@ class YOLONet(object):
                           0:1：置信度，表示这个地方是否有目标
                           1:5：目标边界框  目标中心，宽度和高度(没有归一化)
                           5:25：目标的类别
-        '''
+        """
         with tf.variable_scope(scope):
             # 将网络输出分离为类别和置信度以及边界框的大小，
             # 输出维度为7*7*20 + 7*7*2 + 7*7*2*4=1470
@@ -293,7 +289,6 @@ class YOLONet(object):
                  tf.square(predict_boxes[..., 2]),
                  tf.square(predict_boxes[..., 3])], axis=-1)
             # 计算每个格子预测边界框与真实边界框之间的IOU  [45,7,7,2]
-            # todo 这里输入的两个w和h应该一个是0-1的范围的，一个是开平方的，有问题
             iou_predict_truth = self.calc_iou(predict_boxes_tran, boxes)
 
             # calculate I tensor [BATCH_SIZE, CELL_SIZE, CELL_SIZE, BOXES_PER_CELL]
